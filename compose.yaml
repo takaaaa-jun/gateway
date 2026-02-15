@@ -1,0 +1,36 @@
+services:
+  gateway:
+    image: nginx:1.27-alpine # nginxのイメージを指定
+    ports:
+      - "80:80" # 80(ホスト):80(コンテナ)
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro # nginx.confをマウント--roは読み取り専用--./nginx.conf(自分のいる場所のファイル):/etc/nginx/nginx.conf(コンテナのファイル)
+      - ./conf.d:/etc/nginx/conf.d:ro # conf.dをマウント--roは読み取り専用--./conf.d(自分のいる場所のフォルダ):/etc/nginx/conf.d(コンテナのフォルダ)
+    networks: # ネットワークの使用宣言
+      - shared-gateway-net # shared-gateway-netに接続
+    restart: unless-stopped # コンテナが停止されない限り自動的に再起動
+
+networks: # ネットワークの定義--ネットワークとはコンテナ同士が通信するための仮想的なネットワーク--同じネットワークに接続されているコンテナ同士は通信できる
+  shared-gateway-net: # ネットワークの名前
+    external: true # 既存のネットワークを使用
+
+# etcとは
+# Linuxシステムの設定ファイル置き場
+# Nginx（Webサーバー）は、起動すると 「/etc/nginx/ フォルダにある設定ファイルを読み込んで動く」 ようにプログラムされている
+# このプログラムで読み込むファイルを自分の作成したファイルの場所に置き換えることでNginxの設定を変更できる
+
+# conf.dとは
+# directoryの略
+# Nginxの設定ファイルを置く場所
+
+# conf.dのメリット
+# 1. 設定ファイルを分割できる
+# 2. 設定ファイルを管理しやすい
+# 3. 設定ファイルを再利用できる
+# 4. 設定ファイルをテストしやすい
+# 5. 設定ファイルをデバッグしやすい
+
+# externalとは
+# ネットワークは一度，手動で作成しなければならない（しない場合はエラーが出る）
+# 外部のネットワークと通信できるようにする
+# 既存のネットワークを使用することを宣言する
