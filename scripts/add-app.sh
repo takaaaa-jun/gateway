@@ -27,7 +27,13 @@ output="$script_dir/../conf.d/$app_name.conf"
 if ! (set -C; cat > "$output" <<EOF
 # Generated for $app_name. Both services must join shared-gateway-net.
 location = /$app_name {
-    return 301 /$app_name/;
+    set \$upstream_app http://$app_name-frontend:80;
+    proxy_pass \$upstream_app;
+    proxy_set_header Host \$host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto \$scheme;
+    proxy_set_header X-Forwarded-Prefix /$app_name;
 }
 
 location = /$app_name/api {
